@@ -70,6 +70,9 @@ class Photometry:
     def __init__(self):
         self.ADC1 = pyb.ADC(hwc.pins["analog_1"])
         self.ADC2 = pyb.ADC(hwc.pins["analog_2"])
+        
+        self.adcs = (self.ADC1, self.ADC2)
+
         self.DI1 = pyb.Pin(hwc.pins["digital_1"], pyb.Pin.IN, pyb.Pin.PULL_DOWN)
         self.DI2 = None
         self.LED1 = pyb.DAC(1, bits=12)
@@ -86,6 +89,8 @@ class Photometry:
         #pritish
         self.ovs_buffer_adc1 = array("H", [0] * 64)  # Oversampling buffer
         self.ovs_buffer_adc2 = array("H", [0] * 64)  # Oversampling buffer
+
+        self.ovs_buffers = (self.ovs_buffer_adc1, self.ovs_buffer_adc2)
 
     def set_mode(self, mode):
         # Set the acquisition mode.
@@ -296,7 +301,7 @@ class Photometry:
         pc = self.pulse_config[pulse]
 
         if pc.adc1 and pc.adc2:
-            pyb.ADC.read_timed_multi((self.ADC1, self.ADC2), (self.ovs_buffer_adc1, self.ovs_buffer_adc2), self.ovs_timer)
+            pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
         elif pc.adc1:
             self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
         elif pc.adc2:
@@ -317,7 +322,7 @@ class Photometry:
         pyb.udelay(300)  # Wait before reading ADC (us).
 
         if pc.adc1 and pc.adc2:
-            pyb.ADC.read_timed_multi((self.ADC1, self.ADC2), (self.ovs_buffer_adc1, self.ovs_buffer_adc2), self.ovs_timer)
+            pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
         elif pc.adc1:
             self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
         elif pc.adc2:
