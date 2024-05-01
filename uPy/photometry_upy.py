@@ -10,7 +10,7 @@ from array import array
 from ucollections import namedtuple
 
 
-micropython.alloc_emergency_exception_buf(100)  # Allocate space for error messages raised during interrupt processing.
+micropython.alloc_emergency_exception_buf(200)  # Allocate space for error messages raised during interrupt processing.
 
 import hardware_config as hwc
 
