@@ -93,37 +93,27 @@ class Photometry:
                         "cyRFP_pulsed", "cyRFP_pulsed_iso"
                         ], "Invalid mode."
         self.mode = mode
+        
+        #defaults
+        self.n_digital_signals = 2 #generally 2 digital signals are used
+        self.DI2 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.IN, pyb.Pin.PULL_DOWN) 
+        self.LED3 = None
+        self.n_analog_signals = 2
+        self.oversampling_rate = hwc.oversampling_rate["pulsed"]
+
+        #overwirite defaults for specific modes
         if mode == "2EX_2EM_continuous":
             self.oversampling_rate = hwc.oversampling_rate["continuous"]
-            self.n_analog_signals = 2
-            self.n_digital_signals = 2
-            self.DI2 = None
-            self.LED3 = None
-        elif mode == "2EX_1EM_pulsed" or mode == "2EX_2EM_pulsed":
-            self.oversampling_rate = hwc.oversampling_rate["pulsed"]
-            self.n_analog_signals = 2
-            self.n_digital_signals = 2
-            self.DI2 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.IN, pyb.Pin.PULL_DOWN)
-            self.LED3 = None
         elif mode == "3EX_2EM_pulsed":
-            self.oversampling_rate = hwc.oversampling_rate["pulsed"]
             self.n_analog_signals = 3
-            self.n_digital_signals = 1
+            #this one overwrites the digital input to be output.
+            self.n_digital_signals = 1 # Only one digital signal for 3EX_2EM.
             self.DI2 = None
             self.LED3 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.OUT, pyb.Pin.PULL_DOWN)
-        #pritish
-        elif mode == "cyRFP_pulsed":
-            self.oversampling_rate = hwc.oversampling_rate["pulsed"]
-            self.n_analog_signals = 2
-            self.n_digital_signals = 2
-            self.DI2 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.IN, pyb.Pin.PULL_DOWN)
-            self.LED3 = None
-        elif mode == "cyRFP_pulsed_iso":
-            self.oversampling_rate = hwc.oversampling_rate["pulsed"]
+        elif mode == "cyRFP_pulsed_iso":           
             self.n_analog_signals = 4
-            self.n_digital_signals = 2
-            self.DI2 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.IN, pyb.Pin.PULL_DOWN)
-            self.LED3 = None
+
+        #add configs for the modes
         self.pulse_config = protocols_pulsed[mode]
         self.write_ind2pulse = write_ind2pulse[mode]
 
@@ -369,7 +359,7 @@ class Photometry:
                 digital = 0
             #write second sample
             self.sample_buffers[self.write_buf][self.write_ind] = (self.sample_adc2 << 1) | digital
-            
+
         elif pc.adc1:
             self.sample_buffers[self.write_buf][self.write_ind] = (self.sample_adc1 << 1) | digital
         elif pc.adc2:
