@@ -2,7 +2,8 @@ import json
 from pathlib import Path
 from dataclasses import dataclass, asdict
 from serial.tools import list_ports
-from pyqtgraph.Qt import QtCore, QtWidgets
+#from pyqtgraph.Qt import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from GUI.dir_paths import config_dir
 from GUI.acquisition_board import get_board_info, set_flashdrive_enabled
@@ -10,7 +11,8 @@ from GUI.acquisition_board import get_board_info, set_flashdrive_enabled
 
 class Setups_tab(QtWidgets.QWidget):
     def __init__(self, parent=None):
-        super(QtWidgets.QWidget, self).__init__(parent)
+        #super(QtWidgets.QWidget, self).__init__(parent)
+        super().__init__(parent)
         self.GUI_main = parent
         self.save_path = Path(config_dir, "setups.json")
 

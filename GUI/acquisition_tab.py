@@ -69,7 +69,7 @@ def cbox_update_options(cbox, options):
 
 class Acquisition_tab(QtWidgets.QWidget):
     def __init__(self, parent=None):
-        super(QtWidgets.QWidget, self).__init__(parent)
+        super().__init__(parent)
         self.GUI_main = self.parent()
 
         # Variables.
@@ -373,7 +373,6 @@ class Acquisition_tab(QtWidgets.QWidget):
 
     def load_config(self):
         """Load tab configuration from json file"""
-        self.disconnect()
         filename = QtWidgets.QFileDialog.getOpenFileName(self, "", str(experiments_dir), ("JSON files (*.json)"))[0]
         with open(filename, "r", encoding="utf-8") as load_file:
             multitab_config = Multitab_config(**json.loads(load_file.read()))
@@ -404,7 +403,7 @@ class Setupbox(QtWidgets.QFrame):
     """Widget for displaying data from a single setup."""
 
     def __init__(self, parent, ID):
-        super(QtWidgets.QFrame, self).__init__(parent=parent)
+        super().__init__(parent=parent)
         self.setFrameStyle(QtWidgets.QFrame.Shape.StyledPanel | QtWidgets.QFrame.Shadow.Plain)
         self.acquisition_tab = self.parent()
         self.setups_tab = self.acquisition_tab.GUI_main.setups_tab
@@ -457,6 +456,7 @@ class Setupbox(QtWidgets.QFrame):
         self.record_button.clicked.connect(self.record)
         self.stop_button.clicked.connect(self.stop)
 
+        
         # Plots
 
         self.signals_plot = Signals_plot(self)

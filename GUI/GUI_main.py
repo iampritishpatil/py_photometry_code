@@ -6,14 +6,45 @@ import sys
 import ctypes
 import traceback
 import logging
-from pyqtgraph.Qt import QtGui, QtWidgets, QtCore
+#from pyqtgraph.Qt import QtGui, QtWidgets, QtCore
+from PySide6 import QtCore, QtWidgets, QtGui
 
 import config.GUI_config as GUI_config
 from GUI.acquisition_tab import Acquisition_tab
 from GUI.setups_tab import Setups_tab
+from threading import Thread
+from threading import Event
+import zmq # added by LIOR SEGEV for communicaitn with EPA qt application
+from time import sleep # added by LIOR SEGEV for communicaitn with EPA qt application
 
 if os.name == "nt":  # Needed on windows to get taskbar icon to display correctly.
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("pyPhotometry")
+
+# added by LIOR SEGEV for communicaitn with EPA qt application
+# zeromq server for communication with EPA application
+import zmq
+
+class ZMQ_server:
+    def __init__(self, parent_window):
+        self.parent_window = parent_window
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REP)
+        self.socket.bind("tcp://127.0.0.1:5557")
+        self.terminate_thread_event = Event()
+        self.server_thread = Thread(target=self.run_server)
+        self.server_thread.start()
+
+    def run_server(self):
+        while not self.terminate_thread_event.is_set():
+
+            message = self.socket.recv()
+            print("Received request: %s" % message)
+            self.parent_window.handle_message(message)
+            self.socket.send_string("Message_recieved")
+
+            sleep(0.1)
+
+# ------------------------------------------------------------------ END addition by LIOR SEGEV
 
 # Photometry_GUI ------------------------------------------------------------------
 
@@ -58,6 +89,23 @@ class GUI_main(QtWidgets.QMainWindow):
         self.refresh()  # Refresh ports list.
         self.refresh_timer.start(self.refresh_interval)
 
+        # run zeromq server for communication with EPA application
+        self.zmq_server = ZMQ_server(self)
+    
+    def handle_message(self, message):
+        print(
+            "Message recieved: {}".format(message)
+        )
+        if message == b"start":
+            self.acquisition_tab.setupboxes[0].start_button.clicked.emit()
+            self.acquisition_tab.setupboxes[0].record_button.clicked.emit()
+        elif message == b'stop':
+            self.acquisition_tab.setupboxes[0].stop_button.clicked.emit()
+
+
+        # emit the correct order of signals to the acquisition tab to be done!
+
+
     def refresh(self):
         # Called regularly while not running to update tabs.
         self.acquisition_tab.refresh()
@@ -71,6 +119,11 @@ class GUI_main(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         """Called when GUI window is closed."""
+        # LIOR SEGEV
+        self.zmq_server.socket.close()
+        self.zmq_server.terminate_thread_event.set()
+        self.zmq_server.server_thread.join()
+        #-- LIOR SEGEV
         if self.current_tab_ind == 0:
             self.acquisition_tab.disconnect()
         event.accept()
