@@ -8,7 +8,7 @@ pins = {
 }  # Pyboard Pins used for analog and digital signals.
 
 LED_calibration = {
-    "slope": 38.15,
+    "slope": 9.78,
     "offset": 6.26,
 }  # Calibration of DAC values against LED currents: DAC_value = offset + slope * LED_current_mA.
 
@@ -20,8 +20,8 @@ max_sampling_rate = {  # Maximum sampling rate in continuous and time division a
 }
 
 max_LED_current = {  # Maximum LED current in continuous and time division acquisition modes (mA).
-    "continuous": 100,
-    "pulsed": 100,
+    "continuous": 100, # supposed to not be increased for the continuous mode to avoid overheating the LED.
+    "pulsed": 200,
 }
 
 oversampling_rate = {"continuous": 3e5, "pulsed": 256e3}  # Rate at which ADC samples are aquired for oversampling.
