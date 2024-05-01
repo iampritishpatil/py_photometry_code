@@ -57,7 +57,7 @@ write_ind2pulse = {
     "2EX_2EM_pulsed": [0, 1],
     "3EX_2EM_pulsed": [0, 1, 2],
     "cyRFP_pulsed": [0,0],
-    "cyRFP_pulsed_iso": [0,0,1,1,]
+    "cyRFP_pulsed_iso": [0,0,1,1]
 }
 
 
@@ -114,8 +114,9 @@ class Photometry:
             self.n_analog_signals = 4
 
         #add configs for the modes
-        self.pulse_config = protocols_pulsed[mode]
-        self.write_ind2pulse = write_ind2pulse[mode]
+        if mode in protocols_pulsed:
+            self.pulse_config = protocols_pulsed[mode]
+            self.write_ind2pulse = write_ind2pulse[mode]
 
     def set_LED_current(self, LED_1_current=None, LED_2_current=None):
         # Set the LED current.
@@ -170,7 +171,7 @@ class Photometry:
             self.LED2.write(self.LED_2_value)
         else:
             self.sampling_timer.init(freq=sampling_rate * self.n_analog_signals)
-            self.sampling_timer.callback(self.pulsed_ISR)
+            self.sampling_timer.callback(self.pulsed_ISR_v2)
         while True:
             if self.buffer_ready:
                 self._send_buffer()
@@ -290,7 +291,7 @@ class Photometry:
         # Interrupt service routine for pulsed acquisition modes.
 
         write_ind_mod = self.write_ind % self.n_analog_signals
-        pulse = write_ind2pulse[write_ind_mod]
+        pulse = self.write_ind2pulse[write_ind_mod]
         # Read baseline, turn on LED.
         pc = self.pulse_config[pulse]
 
