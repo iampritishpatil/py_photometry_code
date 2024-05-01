@@ -46,7 +46,7 @@ protocols_pulsed = {
         PulseSettings(adc1=True, adc2=True, LED1=True, LED2=False, LED3=False),
     ],
 
-    "cyRFP_pulsed_iso" : [
+    "cyRFP_iso_pulsed" : [
         PulseSettings(adc1=True, adc2=True, LED1=True, LED2=False, LED3=False),
         PulseSettings(adc1=True, adc2=True, LED1=False, LED2=True, LED3=False),
     ]
@@ -57,7 +57,7 @@ write_ind2pulse = {
     "2EX_2EM_pulsed": [0, 1],
     "3EX_2EM_pulsed": [0, 1, 2],
     "cyRFP_pulsed": [0,0],
-    "cyRFP_pulsed_iso": [0,0,1,1]
+    "cyRFP_iso_pulsed": [0,0,1,1]
 }
 
 
@@ -95,7 +95,7 @@ class Photometry:
     def set_mode(self, mode):
         # Set the acquisition mode.
         assert mode in ["2EX_2EM_continuous", "2EX_1EM_pulsed", "2EX_2EM_pulsed", "3EX_2EM_pulsed",
-                        "cyRFP_pulsed", "cyRFP_pulsed_iso"
+                        "cyRFP_pulsed", "cyRFP_iso_pulsed"
                         ], "Invalid mode."
         self.mode = mode
         
@@ -115,7 +115,7 @@ class Photometry:
             self.n_digital_signals = 1 # Only one digital signal for 3EX_2EM.
             self.DI2 = None
             self.LED3 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.OUT, pyb.Pin.PULL_DOWN)
-        elif mode == "cyRFP_pulsed_iso":           
+        elif mode == "cyRFP_iso_pulsed":           
             self.n_analog_signals = 4
 
         #add configs for the modes

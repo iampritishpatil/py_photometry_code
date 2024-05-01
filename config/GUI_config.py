@@ -19,7 +19,7 @@ available_acquisition_modes = [  # Comment out modes to hide them in GUI dropdow
     "2EX_2EM_pulsed",
     "3EX_2EM_pulsed",
     "cyRFP_pulsed",
-    "cyRFP_pulsed_iso"
+    "cyRFP_iso_pulsed"
 ]
 
 default_filetype = "ppd"  # 'ppd' or 'csv'
