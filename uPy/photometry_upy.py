@@ -48,7 +48,7 @@ protocols_pulsed = {
 
     "cyRFP_iso_pulsed" : [
         PulseSettings(adc1=True, adc2=True, LED1=True, LED2=False, LED3=False),
-        PulseSettings(adc1=True, adc2=True, LED1=False, LED2=True, LED3=False),
+        PulseSettings(adc1=True, adc2=False, LED1=False, LED2=True, LED3=False),
     ]
 }
 
@@ -57,7 +57,7 @@ write_ind2pulse = {
     "2EX_2EM_pulsed": [0, 1],
     "3EX_2EM_pulsed": [0, 1, 2],
     "cyRFP_pulsed": [0,0],
-    "cyRFP_iso_pulsed": [0,0,1,1]
+    "cyRFP_iso_pulsed": [0,0,1]
 }
 
 
