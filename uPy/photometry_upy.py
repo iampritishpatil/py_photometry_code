@@ -116,8 +116,7 @@ class Photometry:
             self.DI2 = None
             self.LED3 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.OUT, pyb.Pin.PULL_DOWN)
         elif mode == "cyRFP_iso_pulsed":           
-            self.n_analog_signals = 4
-
+            self.n_analog_signals = 3
         #add configs for the modes
         if mode in protocols_pulsed:
             self.pulse_config = protocols_pulsed[mode]
@@ -301,12 +300,12 @@ class Photometry:
         # Read baseline, turn on LED.
         pc = self.pulse_config[pulse]
 
-        if pc.adc1 and pc.adc2:
-            pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
-        elif pc.adc1:
-            self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
-        elif pc.adc2:
-            self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
+        # if pc.adc1 and pc.adc2:
+        pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
+        # elif pc.adc1:
+        #     self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
+        # elif pc.adc2:
+        #     self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
         
 
         if pc.LED1:
@@ -322,12 +321,12 @@ class Photometry:
 
         pyb.udelay(300)  # Wait before reading ADC (us).
 
-        if pc.adc1 and pc.adc2:
-            pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
-        elif pc.adc1:
-            self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
-        elif pc.adc2:
-            self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
+        # if pc.adc1 and pc.adc2:
+        pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
+        # elif pc.adc1:
+        #     self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
+        # elif pc.adc2:
+        #     self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
 
         if pc.LED1:
             self.LED1.write(0)

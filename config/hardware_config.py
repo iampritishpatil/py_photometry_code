@@ -24,7 +24,7 @@ max_LED_current = {  # Maximum LED current in continuous and time division acqui
     "pulsed": 200,
 }
 
-oversampling_rate = {"continuous": 3e5, "pulsed": 256e3}  # Rate at which ADC samples are aquired for oversampling.
+oversampling_rate = {"continuous": 200e5, "pulsed": 200e3}  # Rate at which ADC samples are aquired for oversampling.
 
 n_signals ={
     "2EX_2EM_continuous": 2,
