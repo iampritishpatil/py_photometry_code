@@ -33,8 +33,8 @@ protocols_pulsed = {
         PulseSettings(adc1=True, adc2=False, LED1=False, LED2=True, LED3=False)
     ],
     "2EX_2EM_pulsed": [
-        PulseSettings(adc1=True, adc2=False, LED1=True, LED2=True, LED3=False),
-        PulseSettings(adc1=False, adc2=True, LED1=True, LED2=True, LED3=False)
+        PulseSettings(adc1=True, adc2=False, LED1=True, LED2=False, LED3=False),
+        PulseSettings(adc1=False, adc2=True, LED1=False, LED2=True, LED3=False)
     ],
     "3EX_2EM_pulsed": [
         PulseSettings(adc1=True, adc2=False, LED1=True, LED2=False, LED3=False),
@@ -219,7 +219,12 @@ class Photometry:
         
         #pritish
         # pyb.ADC.read_timed_multi((self.ADC1, self.ADC2), (self.ovs_buffer_adc1, self.ovs_buffer_adc2), self.ovs_timer)
-        pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
+        # pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
+        self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
+        pyb.udelay(1)            
+        self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
+        pyb.udelay(1)            
+
         
         self.sample = sum(self.ovs_buffer_adc1) >> 3
         self.sample_buffers[self.write_buf][self.write_ind] = (self.sample << 1) | self.DI1.value()
@@ -301,11 +306,13 @@ class Photometry:
         pc = self.pulse_config[pulse]
 
         # if pc.adc1 and pc.adc2:
-        pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
-        # elif pc.adc1:
-        #     self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
-        # elif pc.adc2:
-        #     self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
+        # pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
+        if pc.adc1:
+            self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
+            pyb.udelay(1)            
+        elif pc.adc2:
+            self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
+            pyb.udelay(1)            
         
 
         if pc.LED1:
@@ -322,12 +329,13 @@ class Photometry:
         pyb.udelay(300)  # Wait before reading ADC (us).
 
         # if pc.adc1 and pc.adc2:
-        pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
-        # elif pc.adc1:
-        #     self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
-        # elif pc.adc2:
-        #     self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
-
+        # pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
+        if pc.adc1:
+            self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
+            pyb.udelay(1)            
+        elif pc.adc2:
+            self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
+            pyb.udelay(1)
         if pc.LED1:
             self.LED1.write(0)
         if pc.LED2:
