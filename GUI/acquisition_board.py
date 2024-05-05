@@ -47,20 +47,28 @@ class Acquisition_board(Pyboard):
 
     def set_mode(self, mode):
         # Set control channel mode.
-        assert mode in [
+        allowed_modes = [
             "2EX_2EM_continuous",
             "2EX_1EM_pulsed",
             "2EX_2EM_pulsed",
             "3EX_2EM_pulsed",
-        ], "Invalid mode, value values: '2EX_2EM_continuous', '2EX_1EM_pulsed', '2EX_2EM_pulsed', or '3EX_2EM_pulsed'."
+            "cyRFP_pulsed",
+            "cyRFP_iso_pulsed"
+        ]
+        assert mode in allowed_modes, f"Invalid mode : {mode} Allowed modes are {allowed_modes}"
         self.mode = mode
-        self.n_analog_signals = 3 if mode == "3EX_2EM_pulsed" else 2
+
+        
+
+        self.n_analog_signals = hwc.n_signals[mode]
         self.n_digital_signals = 1 if mode == "3EX_2EM_pulsed" else 2
         self.pulsed_mode = mode.split("_")[-1] == "pulsed"
-        self.max_LED_current = hwc.max_sampling_rate["pulsed" if self.pulsed_mode else "continuous"]
         if self.pulsed_mode:
-            self.max_rate = hwc.max_sampling_rate["pulsed"] // self.n_analog_signals
+            self.n_pulses = hwc.n_pulses[mode]
+            self.max_LED_current = hwc.max_LED_current["pulsed"]
+            self.max_rate = hwc.max_sampling_rate["pulsed"] // self.n_pulses
         else:
+            self.max_LED_current = hwc.max_LED_current["continuous"]
             self.max_rate = hwc.max_sampling_rate["continuous"]
         self.set_sampling_rate(self.max_rate)
         self.exec("p.set_mode('{}')".format(mode))
