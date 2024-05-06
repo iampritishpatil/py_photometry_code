@@ -66,7 +66,7 @@ class Acquisition_board(Pyboard):
         if self.pulsed_mode:
             self.n_pulses = hwc.n_pulses[mode]
             self.max_LED_current = hwc.max_LED_current["pulsed"]
-            self.max_rate = hwc.max_sampling_rate["pulsed"] // self.n_pulses
+            self.max_rate = hwc.max_sampling_rate["pulsed"] // self.n_analog_signals
         else:
             self.max_LED_current = hwc.max_LED_current["continuous"]
             self.max_rate = hwc.max_sampling_rate["continuous"]

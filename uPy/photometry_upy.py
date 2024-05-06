@@ -71,7 +71,7 @@ class Photometry:
         self.ADC1 = pyb.ADC(hwc.pins["analog_1"])
         self.ADC2 = pyb.ADC(hwc.pins["analog_2"])
         
-        self.adcs = (self.ADC1, self.ADC2)
+        # self.adcs = (self.ADC1, self.ADC2)
 
         self.DI1 = pyb.Pin(hwc.pins["digital_1"], pyb.Pin.IN, pyb.Pin.PULL_DOWN)
         self.DI2 = None
@@ -90,7 +90,7 @@ class Photometry:
         self.ovs_buffer_adc1 = array("H", [0] * 64)  # Oversampling buffer
         self.ovs_buffer_adc2 = array("H", [0] * 64)  # Oversampling buffer
 
-        self.ovs_buffers = (self.ovs_buffer_adc1, self.ovs_buffer_adc2)
+        # self.ovs_buffers = (self.ovs_buffer_adc1, self.ovs_buffer_adc2)
 
     def set_mode(self, mode):
         # Set the acquisition mode.
@@ -103,22 +103,25 @@ class Photometry:
         self.n_digital_signals = 2 #generally 2 digital signals are used
         self.DI2 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.IN, pyb.Pin.PULL_DOWN) 
         self.LED3 = None
-        self.n_analog_signals = 2
+        # self.n_analog_signals = 2
         self.oversampling_rate = hwc.oversampling_rate["pulsed"]
+        self.n_analog_signals = hwc.n_signals[mode]
+        
 
         #overwirite defaults for specific modes
         if mode == "2EX_2EM_continuous":
             self.oversampling_rate = hwc.oversampling_rate["continuous"]
         elif mode == "3EX_2EM_pulsed":
-            self.n_analog_signals = 3
+            # self.n_analog_signals = 3
             #this one overwrites the digital input to be output.
             self.n_digital_signals = 1 # Only one digital signal for 3EX_2EM.
             self.DI2 = None
             self.LED3 = pyb.Pin(hwc.pins["digital_2"], pyb.Pin.OUT, pyb.Pin.PULL_DOWN)
-        elif mode == "cyRFP_iso_pulsed":           
-            self.n_analog_signals = 3
+        # elif mode == "cyRFP_iso_pulsed":           
+            # self.n_analog_signals = 3
         #add configs for the modes
         if mode in protocols_pulsed:
+            self.n_pulses = hwc.n_pulses[mode]
             self.pulse_config = protocols_pulsed[mode]
             self.write_ind2pulse = write_ind2pulse[mode]
 
@@ -174,7 +177,7 @@ class Photometry:
             self.LED1.write(self.LED_1_value)
             self.LED2.write(self.LED_2_value)
         else:
-            self.sampling_timer.init(freq=sampling_rate * self.n_analog_signals)
+            self.sampling_timer.init(freq=sampling_rate * self.n_pulses)
             self.sampling_timer.callback(self.pulsed_ISR_v2)
         while True:
             if self.buffer_ready:
@@ -220,10 +223,11 @@ class Photometry:
         #pritish
         # pyb.ADC.read_timed_multi((self.ADC1, self.ADC2), (self.ovs_buffer_adc1, self.ovs_buffer_adc2), self.ovs_timer)
         # pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
+
         self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
-        pyb.udelay(1)            
+        pyb.udelay(1)  # Wait before reading ADC (us).
         self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
-        pyb.udelay(1)            
+        pyb.udelay(1)  # Wait before reading ADC (us).
 
         
         self.sample = sum(self.ovs_buffer_adc1) >> 3
@@ -309,10 +313,10 @@ class Photometry:
         # pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
         if pc.adc1:
             self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
-            pyb.udelay(1)            
-        elif pc.adc2:
+            pyb.udelay(1)  # Wait before reading ADC (us).
+        if pc.adc2:
             self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
-            pyb.udelay(1)            
+            pyb.udelay(1)  # Wait before reading ADC (us).
         
 
         if pc.LED1:
@@ -332,10 +336,11 @@ class Photometry:
         # pyb.ADC.read_timed_multi(self.adcs, self.ovs_buffers, self.ovs_timer)
         if pc.adc1:
             self.ADC1.read_timed(self.ovs_buffer_adc1, self.ovs_timer)
-            pyb.udelay(1)            
-        elif pc.adc2:
+            pyb.udelay(1)  # Wait before reading ADC (us).
+        if pc.adc2:
             self.ADC2.read_timed(self.ovs_buffer_adc2, self.ovs_timer)
-            pyb.udelay(1)
+            pyb.udelay(1)  # Wait before reading ADC (us).
+
         if pc.LED1:
             self.LED1.write(0)
         if pc.LED2:
